@@ -1,0 +1,9 @@
+plumber
+jsonlite
+glue
+dplyr
+readr
+ggplot2
+lubridate
+janitor
+data.table
