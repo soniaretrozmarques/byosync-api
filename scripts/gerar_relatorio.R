@@ -28,10 +28,17 @@ SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync@outlook.com")
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  val <- sub(paste0("--", flag, "="), "", args[grepl(paste0("--", flag, "="), args)])
-  if (length(val) == 0) return(NA)
-  return(val)
+  # aceita argumentos do tipo "--flag=valor" OU "--flag valor"
+  val <- NA
+  if (any(grepl(paste0("^--", flag, "="), args))) {
+    val <- sub(paste0("^--", flag, "="), "", args[grepl(paste0("^--", flag, "="), args)])
+  } else if (any(grepl(paste0("^--", flag, "$"), args))) {
+    idx <- which(grepl(paste0("^--", flag, "$"), args))
+    if (length(args) > idx) val <- args[idx + 1]
+  }
+  return(ifelse(length(val) == 0, NA, val))
 }
+
 
 tester_id <- get_arg("tester_id")
 email <- get_arg("email")
