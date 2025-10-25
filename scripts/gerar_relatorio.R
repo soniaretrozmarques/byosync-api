@@ -89,8 +89,10 @@ Pode encontrar o ficheiro em anexo.
 
 Cumprimentos,  
 **Equipa BYOSync**
-    "))
-  )
+    ")),
+    footer = md("Relatório gerado automaticamente por **BYOSync API**.")
+  ) %>%
+    add_attachment(file = output_path)  # ✅ Adiciona o anexo aqui!
 
   smtp_send(
     email = email_msg,
@@ -101,8 +103,7 @@ Cumprimentos,
       user = SMTP_USER,
       provider = SMTP_PROVIDER,
       use_ssl = TRUE
-    ),
-    attachments = output_path
+    )
   )
 
   cat(glue("📨 E-mail enviado para {email}\n"))
