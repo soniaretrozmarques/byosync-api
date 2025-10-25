@@ -17,10 +17,10 @@ if (file.exists(".env")) {
   dotenv::load_dot_env(".env")
 }
 
-SMTP_USER <- Sys.getenv("SMTP_USER", "byosync@outlook.com")
+SMTP_USER <- Sys.getenv("SMTP_USER", "byosync.bot@outlook.com")
 SMTP_PASS <- Sys.getenv("SMTP_PASS", "")
-SMTP_PROVIDER <- Sys.getenv("SMTP_PROVIDER", "outlook")
-SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync@outlook.com")
+SMTP_PROVIDER <- Sys.getenv("SMTP_PROVIDER", "office365")
+SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.bot@outlook.com")
 
 # ------------------------------------------------------------
 # 🧠 Lê argumentos da linha de comando
@@ -28,15 +28,9 @@ SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync@outlook.com")
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  # Aceita formatos "--flag=valor" ou "--flag valor"
-  val <- NA
-  if (any(grepl(paste0("^--", flag, "="), args))) {
-    val <- sub(paste0("^--", flag, "="), "", args[grepl(paste0("^--", flag, "="), args)])
-  } else if (any(grepl(paste0("^--", flag, "$"), args))) {
-    idx <- which(grepl(paste0("^--", flag, "$"), args))
-    if (length(args) > idx) val <- args[idx + 1]
-  }
-  return(ifelse(length(val) == 0, NA, val))
+  val <- sub(paste0("--", flag, "="), "", args[grepl(paste0("--", flag, "="), args)])
+  if (length(val) == 0) return(NA)
+  return(val)
 }
 
 tester_id <- get_arg("tester_id")
@@ -77,9 +71,6 @@ cat(glue("📁 Arquivo salvo: {output_path}\n"))
 # ✉️ Enviar e-mail com blastula
 # ------------------------------------------------------------
 tryCatch({
-  # 🔐 Define a password para o blastula
-  Sys.setenv(BLASTULA_PASSWORD = SMTP_PASS)
-
   email_msg <- compose_email(
     body = md(glue("
 Olá {tester_id},
@@ -89,10 +80,8 @@ Pode encontrar o ficheiro em anexo.
 
 Cumprimentos,  
 **Equipa BYOSync**
-    ")),
-    footer = md("Relatório gerado automaticamente por **BYOSync API**.")
-  ) %>%
-    add_attachment(file = output_path)  # ✅ Adiciona o anexo aqui!
+    "))
+  )
 
   smtp_send(
     email = email_msg,
@@ -101,15 +90,16 @@ Cumprimentos,
     subject = glue("Relatório BYOSync — {tester_id}"),
     credentials = creds(
       user = SMTP_USER,
+      password = SMTP_PASS,
       provider = SMTP_PROVIDER,
       use_ssl = TRUE
-    )
+    ),
+    attachments = output_path
   )
 
-  cat(glue("📨 E-mail enviado para {email}\n"))
+  cat(glue("📨 E-mail enviado com sucesso para {email}\n"))
 }, error = function(e) {
   cat(glue("⚠️ Falha ao enviar e-mail: {e$message}\n"))
 })
 
 flush.console()
-
