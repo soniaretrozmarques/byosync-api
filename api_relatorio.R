@@ -14,7 +14,7 @@ LOG_DIR <- file.path(getwd(), "logs")
 if (!dir.exists(LOG_DIR)) dir.create(LOG_DIR, recursive = TRUE)
 
 # ================================================================
-# 🧠 Função auxiliar: escrever logs locais
+# 🧠 Função auxiliar: escrever logs
 # ================================================================
 log_message <- function(msg) {
   timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
@@ -26,7 +26,8 @@ log_message <- function(msg) {
 # ================================================================
 # 🧩 Endpoint principal — /run_report
 # ================================================================
-# POST https://byosync-api.onrender.com/run_report
+# Exemplo:
+# POST https://teu-render.onrender.com/run_report
 # {
 #   "tester_id": "T01",
 #   "email": "teste@byosync.pt"
@@ -46,7 +47,7 @@ function(req, res) {
     tester_id <- payload$tester_id %||% "NA"
     tester_email <- payload$email %||% "NA"
 
-    log_message(glue("📩 Nova submissão: {tester_id} ({tester_email})"))
+    log_message(glue("📩 Nova submissão recebida: {tester_id} ({tester_email})"))
 
     cmd <- glue('Rscript "{R_SCRIPT_PATH}" --tester_id "{tester_id}" --email "{tester_email}"')
     log_message(glue("🚀 Executando comando: {cmd}"))
@@ -74,3 +75,4 @@ function(req, res) {
 port <- as.numeric(Sys.getenv("PORT", 8000))
 pr <- plumber::plumb("api_relatorio.R")
 pr$run(host = "0.0.0.0", port = port)
+
