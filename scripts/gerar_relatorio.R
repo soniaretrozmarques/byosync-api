@@ -96,11 +96,10 @@ Cumprimentos,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
     credentials = creds(
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      provider = SMTP_PROVIDER,
-      use_ssl = TRUE
-    ),
+  user = SMTP_USER,
+  provider = SMTP_PROVIDER,
+  use_ssl = TRUE
+),
     attachments = output_path
   )
 
