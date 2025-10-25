@@ -8,9 +8,12 @@ suppressPackageStartupMessages({
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  val <- sub(paste0("--", flag, "="), "", args[grepl(paste0("--", flag, "="), args)])
-  if (length(val) == 0) return(NA)
-  return(val)
+  i <- which(args == paste0("--", flag))
+  if (length(i) > 0 && length(args) >= i + 1) {
+    return(args[i + 1])
+  } else {
+    return(NA)
+  }
 }
 
 tester_id <- get_arg("tester_id")
