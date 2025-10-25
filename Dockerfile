@@ -1,5 +1,5 @@
 # Usa imagem base oficial do R
-FROM rocker/r-base:4.3.1
+FROM rocker/r-ver:4.3.1
 
 # Instala dependências do sistema necessárias para plumber, curl, e blastula
 RUN apt-get update && apt-get install -y \
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     libz-dev \
     libsodium-dev \
     zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
 # Instala os pacotes R necessários
 RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr'), repos='https://cloud.r-project.org')"
