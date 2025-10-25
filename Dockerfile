@@ -1,7 +1,17 @@
 # Usa imagem base oficial do R
 FROM rocker/r-ver:4.3.1
 
-# Instala dependências do sistema necessárias para plumber, curl, e blastula
+# ------------------------------------------------------------
+# 🔧 Instalar dependências do sistema
+# ------------------------------------------------------------
+# Inclui bibliotecas essenciais para:
+# - HTTP/SSL (curl, openssl)
+# - XML/parsing (libxml2)
+# - Geração de relatórios (rmarkdown)
+# - Envio de emails (blastula)
+# - compressão (zlib)
+# - git (libgit2)
+# ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -10,19 +20,32 @@ RUN apt-get update && apt-get install -y \
     libz-dev \
     libsodium-dev \
     zlib1g-dev \
- && rm -rf /var/lib/apt/lists/*
+    pandoc \
+    pandoc-citeproc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instala os pacotes R necessários
-RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr'), repos='https://cloud.r-project.org')"
+# ------------------------------------------------------------
+# 📦 Instalar pacotes R necessários
+# ------------------------------------------------------------
+RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr', 'httr', 'jsonlite'), repos='https://cloud.r-project.org')"
 
-# Define o diretório de trabalho
+# ------------------------------------------------------------
+# 🏗️ Definir diretório de trabalho
+# ------------------------------------------------------------
 WORKDIR /app
 
-# Copia todos os ficheiros da app
+# ------------------------------------------------------------
+# 📁 Copiar todos os ficheiros da aplicação
+# ------------------------------------------------------------
 COPY . /app
 
-# Expõe a porta que o Render usa
+# ------------------------------------------------------------
+# 🌐 Expor porta usada pelo Render
+# ------------------------------------------------------------
 EXPOSE 8000
 
-# Comando de arranque
+# ------------------------------------------------------------
+# 🚀 Comando de arranque
+# ------------------------------------------------------------
 CMD ["Rscript", "start.R"]
+
