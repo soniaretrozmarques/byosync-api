@@ -1,3 +1,5 @@
+# Placeholder para Render (não usar Python)
+
 plumber
 jsonlite
 glue
@@ -7,3 +9,4 @@ ggplot2
 lubridate
 janitor
 data.table
+
