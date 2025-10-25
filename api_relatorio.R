@@ -21,10 +21,12 @@ log_message <- function(msg) {
 #* @apiDescription Gera relatórios automáticos para testers.
 
 #* @post /gerar_relatorio
-#* @param tester_id:string O ID do tester
-#* @param tester_email:string Email do tester
 #* @serializer unboxedJSON
-function(req, res, tester_id, tester_email) {
+function(req, res) {
+  # Lê parâmetros tanto de query (GET) como do corpo (POST)
+  tester_id <- req$args$tester_id %||% req$body$tester_id %||% "NA"
+  tester_email <- req$args$tester_email %||% req$body$tester_email %||% "NA"
+
   log_message(glue("📥 Requisição recebida para tester_id={tester_id}, email={tester_email}"))
 
   R_SCRIPT_PATH <- "scripts/gerar_relatorio.R"
@@ -49,6 +51,6 @@ function(req, res, tester_id, tester_email) {
   list(
     status = "ok",
     message = glue("Relatório gerado com sucesso para tester {tester_id}"),
-    output = output
+    output = paste(output, collapse = "")
   )
 }
