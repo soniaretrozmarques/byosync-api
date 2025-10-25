@@ -1,11 +1,30 @@
 #!/usr/bin/env Rscript
 
+# ================================================================
+# 📊 BYOSync — Script de geração automática de relatórios
+# ================================================================
+
 suppressPackageStartupMessages({
   library(glue)
   library(blastula)
+  library(dotenv)
 })
 
-# Lê argumentos
+# ------------------------------------------------------------
+# 🔧 Carregar variáveis de ambiente (.env ou Render)
+# ------------------------------------------------------------
+if (file.exists(".env")) {
+  dotenv::load_dot_env(".env")
+}
+
+SMTP_USER <- Sys.getenv("SMTP_USER", "byosync@outlook.com")
+SMTP_PASS <- Sys.getenv("SMTP_PASS", "")
+SMTP_PROVIDER <- Sys.getenv("SMTP_PROVIDER", "outlook")
+SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync@outlook.com")
+
+# ------------------------------------------------------------
+# 🧠 Lê argumentos da linha de comando
+# ------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
@@ -17,13 +36,21 @@ get_arg <- function(flag) {
 tester_id <- get_arg("tester_id")
 email <- get_arg("email")
 
-# Diretório de saída
+if (is.na(tester_id) || is.na(email)) {
+  stop("❌ Argumentos 'tester_id' e 'email' são obrigatórios!")
+}
+
+# ------------------------------------------------------------
+# 📁 Diretório de saída
+# ------------------------------------------------------------
 output_dir <- "reports"
 if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 cat(glue("📊 Gerando relatório para tester: {tester_id} | email: {email}\n"))
 
-# Simula geração do relatório
+# ------------------------------------------------------------
+# 🧩 Simula a geração do relatório
+# ------------------------------------------------------------
 Sys.sleep(2)
 output_path <- file.path(output_dir, glue("relatorio_{tester_id}.txt"))
 
@@ -40,14 +67,15 @@ Data: {Sys.time()}
 writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
-# Enviar e-mail com blastula
+# ------------------------------------------------------------
+# ✉️ Enviar e-mail com blastula (seguro via credenciais .env)
+# ------------------------------------------------------------
 tryCatch({
   email_msg <- compose_email(
     body = md(glue("
 Olá {tester_id},
 
-O seu relatório foi gerado com sucesso ✅
-
+O seu relatório foi gerado com sucesso ✅  
 Pode encontrar o ficheiro em anexo.
 
 Cumprimentos,  
@@ -57,12 +85,13 @@ Cumprimentos,
 
   smtp_send(
     email = email_msg,
-    from = "byosync@outlook.com",        # ⚠️ substitui pelo e-mail do servidor
+    from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
     credentials = creds(
-      user = "byosync@outlook.com",       # ⚠️ substitui
-      provider = "outlook",
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      provider = SMTP_PROVIDER,
       use_ssl = TRUE
     ),
     attachments = output_path
