@@ -23,14 +23,23 @@ SMTP_PROVIDER <- Sys.getenv("SMTP_PROVIDER", "office365")
 SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.bot@outlook.com")
 
 # ------------------------------------------------------------
-# 🧠 Lê argumentos da linha de comando
+# 🧠 Lê argumentos da linha de comando (robusto)
 # ------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  val <- sub(paste0("--", flag, "="), "", args[grepl(paste0("--", flag, "="), args)])
-  if (length(val) == 0) return(NA)
-  return(val)
+  # Aceita --flag=valor ou --flag valor
+  match_eq <- grep(paste0("^--", flag, "="), args, value = TRUE)
+  if (length(match_eq) > 0) {
+    return(sub(paste0("^--", flag,="), "", match_eq))
+  }
+
+  match_plain <- which(args == paste0("--", flag))
+  if (length(match_plain) > 0 && length(args) >= match_plain + 1) {
+    return(args[match_plain + 1])
+  }
+
+  return(NA)
 }
 
 tester_id <- get_arg("tester_id")
@@ -71,6 +80,8 @@ cat(glue("📁 Arquivo salvo: {output_path}\n"))
 # ✉️ Enviar e-mail com blastula
 # ------------------------------------------------------------
 tryCatch({
+  Sys.setenv(BLASTULA_PASSWORD = SMTP_PASS)  # 🔐 Necessário para autenticação Outlook
+
   email_msg <- compose_email(
     body = md(glue("
 Olá {tester_id},
@@ -90,7 +101,6 @@ Cumprimentos,
     subject = glue("Relatório BYOSync — {tester_id}"),
     credentials = creds(
       user = SMTP_USER,
-      password = SMTP_PASS,
       provider = SMTP_PROVIDER,
       use_ssl = TRUE
     ),
