@@ -5,6 +5,4 @@ services:
     plan: free
     dockerfilePath: ./Dockerfile
     autoDeploy: true
-    envVars:
-      - key: PORT
-        value: 8000
+
