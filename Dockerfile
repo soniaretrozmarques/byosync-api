@@ -9,12 +9,14 @@ RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
-    libz-dev \
-    libsodium-dev \
-    && rm -rf /var/lib/apt/lists/*
+    zlib1g-dev \
+    pandoc \
+    texlive-latex-base \
+    texlive-fonts-recommended \
+    texlive-extra-utils \
+    texlive-latex-extra
 
-# Instalar pacotes R necessários
-RUN R -e "install.packages(c('plumber', 'glue', 'jsonlite'), repos='https://cloud.r-project.org')"
+RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'optparse'), repos='https://cloud.r-project.org')"
 
 # Define diretório de trabalho
 WORKDIR /app
