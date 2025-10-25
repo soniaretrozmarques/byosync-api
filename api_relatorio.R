@@ -5,6 +5,7 @@
 
 library(plumber)
 library(glue)
+library(jsonlite)
 
 #------------------------------------------------------------
 # Função auxiliar de log
@@ -25,9 +26,21 @@ log_message <- function(msg) {
 #* @param tester_email:string Email do tester
 #* @serializer unboxedJSON
 function(req, res) {
-  # Lê parâmetros da query ou do body
-  tester_id <- if (!is.null(req$args$tester_id)) req$args$tester_id else if (!is.null(req$body$tester_id)) req$body$tester_id else "NA"
-  tester_email <- if (!is.null(req$args$tester_email)) req$args$tester_email else if (!is.null(req$body$tester_email)) req$body$tester_email else "NA"
+
+  # Lê os parâmetros vindos da query
+  tester_id <- req$args$tester_id
+  tester_email <- req$args$tester_email
+
+  # Se vierem vazios, tenta ler o corpo JSON
+  if ((is.null(tester_id) || tester_id == "") && !is.null(req$postBody) && req$postBody != "") {
+    body <- tryCatch(jsonlite::fromJSON(req$postBody), error = function(e) NULL)
+    if (!is.null(body$tester_id)) tester_id <- body$tester_id
+    if (!is.null(body$tester_email)) tester_email <- body$tester_email
+  }
+
+  # Valores padrão se ainda estiverem vazios
+  if (is.null(tester_id) || tester_id == "") tester_id <- "NA"
+  if (is.null(tester_email) || tester_email == "") tester_email <- "NA"
 
   log_message(glue("📥 Requisição recebida para tester_id={tester_id}, email={tester_email}"))
 
@@ -56,4 +69,3 @@ function(req, res) {
     output = output
   )
 }
-
