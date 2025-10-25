@@ -1,31 +1,28 @@
-# ============================================================
-# Dockerfile para API BYOSync no Render (corrigido)
-# ============================================================
+# Usa imagem base oficial do R
+FROM rocker/r-base:4.3.1
 
-FROM rocker/r-ver:4.3.1
-
-# Atualiza e instala dependências do sistema necessárias para plumber, curl, etc.
+# Instala dependências do sistema necessárias para plumber, curl, e blastula
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
+    libgit2-dev \
+    libz-dev \
+    libsodium-dev \
     zlib1g-dev \
-    pandoc \
-    texlive-latex-base \
-    texlive-fonts-recommended \
-    texlive-extra-utils \
-    texlive-latex-extra
+    && rm -rf /var/lib/apt/lists/*
 
-RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'optparse'), repos='https://cloud.r-project.org')"
+# Instala os pacotes R necessários
+RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr'), repos='https://cloud.r-project.org')"
 
-# Define diretório de trabalho
+# Define o diretório de trabalho
 WORKDIR /app
 
-# Copia os ficheiros do projeto
+# Copia todos os ficheiros da app
 COPY . /app
 
-# Expõe a porta usada pelo Render
+# Expõe a porta que o Render usa
 EXPOSE 8000
 
-# Comando para iniciar o servidor
+# Comando de arranque
 CMD ["Rscript", "start.R"]
