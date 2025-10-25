@@ -1,17 +1,27 @@
 # scripts/gerar_relatorio.R
+
 args <- commandArgs(trailingOnly = TRUE)
 
-# Lê os argumentos passados pela API
-tester_id <- sub("--tester_id=", "", args[grep("--tester_id=", args)])
-email <- sub("--email=", "", args[grep("--email=", args)])
+# Lê parâmetros
+tester_id <- NA
+tester_email <- NA
 
-cat("📊 Gerando relatório para tester:", tester_id, "email:", email, "\n")
+for (i in seq_along(args)) {
+  if (args[i] == "--tester_id") tester_id <- args[i + 1]
+  if (args[i] == "--email") tester_email <- args[i + 1]
+}
 
-# Simula criação do relatório
-Sys.sleep(2)
-cat("✅ Relatório criado com sucesso!\n")
+cat(glue::glue("📊 Gerando relatório para tester: {tester_id} | email: {tester_email}\n"))
 
-# Guarda um arquivo de exemplo
-output_file <- paste0("relatorio_", tester_id, ".txt")
-writeLines(c("Relatório de Tester", paste("ID:", tester_id), paste("Email:", email)), output_file)
-cat("Arquivo salvo:", output_file, "\n")
+# Gera o arquivo de saída (pode ser .txt, .pdf, etc.)
+output_file <- glue::glue("relatorio_{tester_id}.txt")
+writeLines(c(
+  glue::glue("Relatório automático do tester: {tester_id}"),
+  glue::glue("Email: {tester_email}"),
+  glue::glue("Data de geração: {Sys.time()}"),
+  "",
+  "Conteúdo de teste do relatório."
+), output_file)
+
+cat(glue::glue("✅ Relatório criado com sucesso!\n"))
+cat(glue::glue("Arquivo salvo: {output_file}\n"))
