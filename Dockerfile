@@ -1,7 +1,10 @@
-# Usa uma imagem oficial do R base
+# ===============================================================
+# 🐳 Dockerfile — API ByoSync (R + plumber)
+# ===============================================================
+
 FROM rocker/r-ver:4.3.1
 
-# Instala dependências do sistema (necessárias para plumber, httpuv, sodium, etc.)
+# Instala dependências do sistema
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -16,14 +19,12 @@ RUN apt-get update && apt-get install -y \
 # Instala pacotes R necessários
 RUN R -e "install.packages(c('plumber', 'jsonlite', 'glue'), repos='https://cloud.r-project.org/')"
 
-# Define o diretório de trabalho
+# Define diretório de trabalho
 WORKDIR /app
 
-# Copia todo o código para dentro do container
+# Copia todos os ficheiros para dentro do container
 COPY . /app
 
-# Expõe a porta usada pelo plumber
-EXPOSE 8000
+# Define comando padrão de execução
+CMD ["R", "-e", "pr <- plumber::plumb('api_relatorio.R'); pr$run(host='0.0.0.0', port=as.numeric(Sys.getenv('PORT', 8000)))"]
 
-# Comando para iniciar a API
-CMD ["R", "-e", "pr <- plumber::plumb('api_relatorio.R'); pr$run(host='0.0.0.0', port=8000)"]
