@@ -31,7 +31,7 @@ get_arg <- function(flag) {
   # Aceita --flag=valor ou --flag valor
   match_eq <- grep(paste0("^--", flag, "="), args, value = TRUE)
   if (length(match_eq) > 0) {
-    return(sub(paste0("^--", flag,="), "", match_eq))
+    return(sub(paste0("^--", flag, "="), "", match_eq))
   }
 
   match_plain <- which(args == paste0("--", flag))
@@ -113,3 +113,4 @@ Cumprimentos,
 })
 
 flush.console()
+
