@@ -50,17 +50,17 @@ function(req, res) {
     log_message(glue("📩 Nova submissão recebida: {tester_id} ({tester_email})"))
 
     cmd <- glue('Rscript "{R_SCRIPT_PATH}" --tester_id "{tester_id}" --email "{tester_email}"')
-    log_message(glue("🚀 Executando comando: {cmd}"))
+log_message(glue("🚀 Executando comando: {cmd}"))
 
-    output <- system(cmd, intern = TRUE)
-    log_message(glue("📄 Saída do Rscript:\n{paste(output, collapse = "\n")}"))
+output <- system(cmd, intern = TRUE)
+log_message(glue("📄 Saída do Rscript:\n{paste(output, collapse = '\n')}"))
 
-    res$status <- 200
-    list(
-      status = "ok",
-      message = glue("Relatório gerado com sucesso para {tester_id}"),
-      output = output
-    )
+res$status <- 200
+list(
+  status = "ok",
+  message = glue("Relatório gerado com sucesso para {tester_id}"),
+  output = output
+)
 
   }, error = function(e) {
     log_message(glue("❌ Erro: {e$message}"))
