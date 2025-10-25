@@ -70,7 +70,8 @@ function(req, res) {
 }
 
 # ================================================================
-# 🚀 Execução local
+# 🚀 Execução no Render (porta automática)
 # ================================================================
-# plumber::pr("api_relatorio.R") %>% pr_run(port = 8080, host = "0.0.0.0")
-# ================================================================
+port <- as.numeric(Sys.getenv("PORT", 8000))
+pr <- plumber::plumb("api
+
