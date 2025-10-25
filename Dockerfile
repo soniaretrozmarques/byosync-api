@@ -1,17 +1,17 @@
-# Usa uma imagem de R com Plumber
+# Usa uma imagem oficial do R com o Plumber
 FROM rocker/plumber:latest
 
 # Define o diretório de trabalho
 WORKDIR /app
 
-# Copia todos os ficheiros para o container
+# Copia todos os ficheiros do projeto para o container
 COPY . /app
 
-# Expõe a porta que o Render usa
+# Expõe a porta usada pelo Render
 EXPOSE 8080
 
-# Instala pacotes R necessários
+# Instala pacotes necessários
 RUN R -e "install.packages(c('plumber', 'jsonlite', 'glue'))"
 
-# Comando para iniciar o servidor Plumber
-CMD R -e "source('api_relatorio.R'); pr('api_relatorio.R') %>% pr_run(host='0.0.0.0', port=8080)"
+# Comando para correr a API
+CMD R -e "pr <- plumber::pr('api_relatorio.R'); pr$run(host='0.0.0.0', port=8080)"
