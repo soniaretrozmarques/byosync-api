@@ -92,7 +92,8 @@ Pode encontrar o ficheiro em anexo.
 Cumprimentos,  
 **Equipa BYOSync**
     "))
-  )
+  ) %>%
+    add_attachment(file = output_path)  # 🆕 forma compatível com blastula moderno
 
   smtp_send(
     email = email_msg,
@@ -103,8 +104,7 @@ Cumprimentos,
       user = SMTP_USER,
       provider = SMTP_PROVIDER,
       use_ssl = TRUE
-    ),
-    attachments = output_path
+    )
   )
 
   cat(glue("📨 E-mail enviado com sucesso para {email}\n"))
