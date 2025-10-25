@@ -28,7 +28,7 @@ SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync@outlook.com")
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  # aceita argumentos do tipo "--flag=valor" OU "--flag valor"
+  # Aceita formatos "--flag=valor" ou "--flag valor"
   val <- NA
   if (any(grepl(paste0("^--", flag, "="), args))) {
     val <- sub(paste0("^--", flag, "="), "", args[grepl(paste0("^--", flag, "="), args)])
@@ -38,7 +38,6 @@ get_arg <- function(flag) {
   }
   return(ifelse(length(val) == 0, NA, val))
 }
-
 
 tester_id <- get_arg("tester_id")
 email <- get_arg("email")
@@ -75,9 +74,12 @@ writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
 # ------------------------------------------------------------
-# ✉️ Enviar e-mail com blastula (seguro via credenciais .env)
+# ✉️ Enviar e-mail com blastula
 # ------------------------------------------------------------
 tryCatch({
+  # 🔐 Define a password para o blastula
+  Sys.setenv(BLASTULA_PASSWORD = SMTP_PASS)
+
   email_msg <- compose_email(
     body = md(glue("
 Olá {tester_id},
@@ -96,10 +98,10 @@ Cumprimentos,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
     credentials = creds(
-  user = SMTP_USER,
-  provider = SMTP_PROVIDER,
-  use_ssl = TRUE
-),
+      user = SMTP_USER,
+      provider = SMTP_PROVIDER,
+      use_ssl = TRUE
+    ),
     attachments = output_path
   )
 
@@ -109,3 +111,4 @@ Cumprimentos,
 })
 
 flush.console()
+
