@@ -4,14 +4,6 @@ FROM rocker/r-ver:4.3.1
 # ------------------------------------------------------------
 # 🔧 Instalar dependências do sistema
 # ------------------------------------------------------------
-# Inclui bibliotecas essenciais para:
-# - HTTP/SSL (curl, openssl)
-# - XML/parsing (libxml2)
-# - Geração de relatórios (rmarkdown)
-# - Envio de emails (blastula)
-# - Compressão e Git (zlib, libgit2)
-# - Pandoc (para gerar relatórios em HTML/PDF)
-# ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -28,7 +20,6 @@ RUN apt-get update && apt-get install -y \
 # 📦 Instalar pacotes R necessários
 # ------------------------------------------------------------
 RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org')"
-RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org'); remotes::install_version('blastula', version = '0.4.1', repos='https://cloud.r-project.org')"
 
 # ------------------------------------------------------------
 # 🏗️ Definir diretório de trabalho
