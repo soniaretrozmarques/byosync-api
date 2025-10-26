@@ -94,11 +94,11 @@ Cumprimentos,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = creds(
+    credentials = creds_smtp(
       host = "smtp.sendgrid.net",
       port = 587,
       user = "apikey",
-      password = Sys.getenv("SENDGRID_API_KEY"),
+      pass = Sys.getenv("SENDGRID_API_KEY"),
       use_ssl = TRUE
     ),
     attachments = output_path
