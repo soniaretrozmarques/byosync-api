@@ -1,4 +1,4 @@
-# Usa imagem base oficial do R (com suporte a pacotes compilados)
+# Usa imagem base oficial do R
 FROM rocker/r-ver:4.3.1
 
 # ------------------------------------------------------------
@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libxml2-dev \
     libgit2-dev \
+    libsodium-dev \           # ✅ necessário para o pacote 'sodium'
     zlib1g-dev \
     pandoc \
     build-essential \
@@ -19,11 +20,8 @@ RUN apt-get update && apt-get install -y \
 # ------------------------------------------------------------
 RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
 
-# Instala todos os pacotes de uma vez, com dependências forçadas
+# Instala todos os pacotes necessários de uma vez
 RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org', dependencies=TRUE)"
-
-# Força reinstalação do plumber (garante que está disponível)
-RUN R -e "if(!requireNamespace('plumber', quietly=TRUE)) install.packages('plumber', repos='https://cloud.r-project.org')"
 
 # ------------------------------------------------------------
 # 🏗️ Diretório de trabalho
