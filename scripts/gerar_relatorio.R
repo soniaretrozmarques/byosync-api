@@ -93,13 +93,13 @@ Cumprimentos,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = creds_smtp(
-      host = "smtp.gmail.com",
-      port = 465,
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      use_ssl = TRUE
-    ),
+    email_creds <- blastula::creds(
+  user = "byosync.health@gmail.com",
+  password = Sys.getenv("GMAIL_PASS"),
+  host = "smtp.gmail.com",
+  port = 465,
+  use_ssl = TRUE
+) 
     attachments = output_path
   )
 
