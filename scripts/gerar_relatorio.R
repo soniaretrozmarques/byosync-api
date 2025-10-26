@@ -17,22 +17,21 @@ if (file.exists(".env")) {
   dotenv::load_dot_env(".env")
 }
 
-SENDGRID_API_KEY <- Sys.getenv("SENDGRID_API_KEY")
+SMTP_USER <- Sys.getenv("SMTP_USER", "byosync.health@gmail.com")
+SMTP_PASS <- Sys.getenv("SMTP_PASS", "")
 SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.health@gmail.com")
 
 # ------------------------------------------------------------
-# 🧠 Ler argumentos da linha de comando
+# 🧠 Lê argumentos da linha de comando
 # ------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  # Suporta argumentos no formato --flag=value
   match_eq <- grep(paste0("^--", flag, "="), args, value = TRUE)
   if (length(match_eq) > 0) {
     return(sub(paste0("^--", flag, "="), "", match_eq))
   }
-  # Suporta formato --flag value
-  match_space <- which(args == paste0("--", flag))
+  match_space <- grep(paste0("^--", flag, "$"), args)
   if (length(match_space) > 0 && length(args) >= match_space + 1) {
     return(args[match_space + 1])
   }
@@ -55,7 +54,7 @@ if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 cat(glue("📊 Gerando relatório para tester: {tester_id} | email: {email}\n"))
 
 # ------------------------------------------------------------
-# 🧩 Simular a geração do relatório
+# 🧩 Simula a geração do relatório
 # ------------------------------------------------------------
 Sys.sleep(2)
 output_path <- file.path(output_dir, glue("relatorio_{tester_id}.txt"))
@@ -74,7 +73,7 @@ writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
 # ------------------------------------------------------------
-# ✉️ Enviar e-mail via SendGrid (usando blastula)
+# ✉️ Enviar e-mail com blastula via Gmail SMTP
 # ------------------------------------------------------------
 tryCatch({
   email_msg <- compose_email(
@@ -95,10 +94,10 @@ Cumprimentos,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
     credentials = creds_smtp(
-      host = "smtp.sendgrid.net",
-      port = 587,
-      user = "apikey",
-      pass = Sys.getenv("SENDGRID_API_KEY"),
+      host = "smtp.gmail.com",
+      port = 465,
+      user = SMTP_USER,
+      password = SMTP_PASS,
       use_ssl = TRUE
     ),
     attachments = output_path
