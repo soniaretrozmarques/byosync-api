@@ -17,28 +17,25 @@ if (file.exists(".env")) {
   dotenv::load_dot_env(".env")
 }
 
-SMTP_USER <- Sys.getenv("SMTP_USER", "byosync.bot@outlook.com")
-SMTP_PASS <- Sys.getenv("SMTP_PASS", "")
-SMTP_PROVIDER <- Sys.getenv("SMTP_PROVIDER", "office365")
-SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.bot@outlook.com")
+SENDGRID_API_KEY <- Sys.getenv("SENDGRID_API_KEY")
+SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.health@gmail.com")
 
 # ------------------------------------------------------------
-# 🧠 Lê argumentos da linha de comando (robusto)
+# 🧠 Ler argumentos da linha de comando
 # ------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
 get_arg <- function(flag) {
-  # Aceita --flag=valor ou --flag valor
+  # Suporta argumentos no formato --flag=value
   match_eq <- grep(paste0("^--", flag, "="), args, value = TRUE)
   if (length(match_eq) > 0) {
     return(sub(paste0("^--", flag, "="), "", match_eq))
   }
-
-  match_plain <- which(args == paste0("--", flag))
-  if (length(match_plain) > 0 && length(args) >= match_plain + 1) {
-    return(args[match_plain + 1])
+  # Suporta formato --flag value
+  match_space <- which(args == paste0("--", flag))
+  if (length(match_space) > 0 && length(args) >= match_space + 1) {
+    return(args[match_space + 1])
   }
-
   return(NA)
 }
 
@@ -58,7 +55,7 @@ if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 cat(glue("📊 Gerando relatório para tester: {tester_id} | email: {email}\n"))
 
 # ------------------------------------------------------------
-# 🧩 Simula a geração do relatório
+# 🧩 Simular a geração do relatório
 # ------------------------------------------------------------
 Sys.sleep(2)
 output_path <- file.path(output_dir, glue("relatorio_{tester_id}.txt"))
@@ -77,11 +74,9 @@ writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
 # ------------------------------------------------------------
-# ✉️ Enviar e-mail com blastula
+# ✉️ Enviar e-mail via SendGrid (usando blastula)
 # ------------------------------------------------------------
 tryCatch({
-  Sys.setenv(BLASTULA_PASSWORD = SMTP_PASS)  # 🔐 Necessário para autenticação Outlook
-
   email_msg <- compose_email(
     body = md(glue("
 Olá {tester_id},
@@ -92,19 +87,20 @@ Pode encontrar o ficheiro em anexo.
 Cumprimentos,  
 **Equipa BYOSync**
     "))
-  ) %>%
-    add_attachment(file = output_path)  # 🆕 forma compatível com blastula moderno
+  )
 
   smtp_send(
     email = email_msg,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = creds(
-      user = SMTP_USER,
-      provider = SMTP_PROVIDER,
-      use_ssl = TRUE
-    )
+    credentials = creds_anonymous(
+      host = "smtp.sendgrid.net",
+      port = 587,
+      user = "apikey",
+      password = SENDGRID_API_KEY
+    ),
+    attachments = output_path
   )
 
   cat(glue("📨 E-mail enviado com sucesso para {email}\n"))
@@ -113,4 +109,5 @@ Cumprimentos,
 })
 
 flush.console()
+
 
