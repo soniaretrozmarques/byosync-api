@@ -19,8 +19,6 @@ RUN apt-get update && apt-get install -y \
 # 📦 Instalar pacotes R necessários
 # ------------------------------------------------------------
 RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
-
-# Instala todos os pacotes necessários de uma vez
 RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org', dependencies=TRUE)"
 
 # ------------------------------------------------------------
