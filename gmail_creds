@@ -1,0 +1,8 @@
+install.packages("blastula")
+library(blastula)
+
+create_smtp_creds_file(
+  user = "byosync.health@gmail.com",
+  provider = "gmail",
+  file = "gmail_creds"
+)
