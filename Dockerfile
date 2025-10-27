@@ -4,8 +4,6 @@ FROM rocker/r-ver:4.3.1
 # ------------------------------------------------------------
 # 🔧 Instalar dependências do sistema
 # ------------------------------------------------------------
-# Inclui:
-# - libsodium-dev → necessário para o pacote 'sodium' (dependência de plumber)
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
@@ -21,7 +19,12 @@ RUN apt-get update && apt-get install -y \
 # 📦 Instalar pacotes R necessários
 # ------------------------------------------------------------
 RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
-RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'blastula', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+# Instalar tudo o resto, exceto blastula
+RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+# ⚡ Instalar a versão mais recente do blastula (com creds_smtp)
+RUN R -e "remotes::install_github('rstudio/blastula')"
 
 # ------------------------------------------------------------
 # 🏗️ Diretório de trabalho
