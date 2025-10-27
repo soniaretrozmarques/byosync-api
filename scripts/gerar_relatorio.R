@@ -12,17 +12,11 @@ suppressPackageStartupMessages({
 # ------------------------------------------------------------
 # 🧩 Garantir que o pacote blastula esteja instalado e atualizado
 # ------------------------------------------------------------
-if (!requireNamespace("blastula", quietly = TRUE)) {
+if (!requireNamespace("blastula", quietly = TRUE) ||
+    utils::packageVersion("blastula") < "0.4.0") {
   install.packages("blastula", repos = "https://cloud.r-project.org")
 }
-
-# (Opcional: se quiser sempre garantir versão recente)
-# if (utils::packageVersion("blastula") < "0.4.0") {
-#   install.packages("blastula", repos = "https://cloud.r-project.org")
-# }
-
 library(blastula)
-
 
 # ------------------------------------------------------------
 # 🔧 Carregar variáveis de ambiente (.env ou Render)
