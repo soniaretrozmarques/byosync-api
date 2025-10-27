@@ -151,7 +151,7 @@ Cumprimentos,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = get_smtp_credentials(),
+    credentials = blastula::creds_file("gmail_creds"),
     attachments = output_path
   )
 
