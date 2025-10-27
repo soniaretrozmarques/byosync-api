@@ -69,7 +69,7 @@ writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
 # ------------------------------------------------------------
-# ✉️ Enviar e-mail com blastula via Gmail SMTP
+# ✉️ Enviar e-mail com blastula via Gmail SMTP (compatível)
 # ------------------------------------------------------------
 tryCatch({
   email_msg <- compose_email(
@@ -84,14 +84,26 @@ Cumprimentos,
     "))
   )
 
-  # Credenciais SMTP (modo moderno)
-  creds <- blastula::smtp_credentials(
-    host = "smtp.gmail.com",
-    port = 465,
-    user = SMTP_USER,
-    password = SMTP_PASS,
-    use_ssl = TRUE
-  )
+  ns <- getNamespaceExports("blastula")
+  if ("smtp_credentials" %in% ns) {
+    creds <- blastula::smtp_credentials(
+      host = "smtp.gmail.com",
+      port = 465,
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      use_ssl = TRUE
+    )
+  } else if ("creds_smtp" %in% ns) {
+    creds <- blastula::creds_smtp(
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      host = "smtp.gmail.com",
+      port = 465,
+      use_ssl = TRUE
+    )
+  } else {
+    stop("❌ Nenhuma função SMTP suportada encontrada em blastula.")
+  }
 
   smtp_send(
     email = email_msg,
