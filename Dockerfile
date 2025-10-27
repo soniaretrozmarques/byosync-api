@@ -1,3 +1,7 @@
+# =============================================================
+# 🐳 Dockerfile — BYOSync API (Render)
+# =============================================================
+
 # Usa imagem base oficial do R
 FROM rocker/r-ver:4.3.1
 
@@ -18,10 +22,11 @@ RUN apt-get update && apt-get install -y \
 # ------------------------------------------------------------
 # 📦 Instalar pacotes R necessários
 # ------------------------------------------------------------
-RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
+RUN R -e "install.packages(c('remotes'), repos='https://cloud.r-project.org')"
 
-RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv', 'blastula'), \
-  repos='https://cloud.r-project.org', dependencies=TRUE)"
+RUN R -e "install.packages(c( \
+  'plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv', 'blastula' \
+  ), repos='https://cloud.r-project.org', dependencies=TRUE)"
 
 # ------------------------------------------------------------
 # 🏗️ Diretório de trabalho
