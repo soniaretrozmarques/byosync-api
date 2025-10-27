@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-
 # ================================================================
 # 📊 BYOSync — Script de geração automática de relatórios
 # ================================================================
@@ -7,13 +6,8 @@
 suppressPackageStartupMessages({
   library(glue)
   library(dotenv)
+  library(blastula)
 })
-
-# ------------------------------------------------------------
-# 🧩 Garantir que o pacote blastula esteja instalado e atualizado
-# ------------------------------------------------------------
-
-library(blastula)
 
 # ------------------------------------------------------------
 # 🔧 Carregar variáveis de ambiente (.env ou Render)
@@ -75,59 +69,6 @@ writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
 # ------------------------------------------------------------
-# 🧩 Função compatível com várias versões do blastula
-# ------------------------------------------------------------
-get_smtp_credentials <- function() {
-  ns <- getNamespaceExports("blastula")
-  
-  if ("smtp_credentials" %in% ns) {
-    # Versão moderna (>= 0.4.0)
-    return(blastula::smtp_credentials(
-      host = "smtp.gmail.com",
-      port = 465,
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      use_ssl = TRUE
-    ))
-    
-  } else if ("creds_smtp" %in% ns) {
-    # Versão intermédia (~0.3.4)
-    return(blastula::creds_smtp(
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      host = "smtp.gmail.com",
-      port = 465,
-      use_ssl = TRUE
-    ))
-    
-  } else if ("creds" %in% ns) {
-    # Versão antiga (<= 0.3.2)
-    creds_formals <- names(formals(blastula::creds))
-    
-    args <- list(
-      user = SMTP_USER,
-      host = "smtp.gmail.com",
-      port = 465,
-      use_ssl = TRUE
-    )
-    
-    # Verifica se aceita 'pass' ou 'password'
-    if ("pass" %in% creds_formals) {
-      args$pass <- SMTP_PASS
-    } else if ("password" %in% creds_formals) {
-      args$password <- SMTP_PASS
-    } else {
-      stop("❌ Nenhum argumento de senha reconhecido em blastula::creds()")
-    }
-    
-    return(do.call(blastula::creds, args))
-    
-  } else {
-    stop("❌ Nenhuma função de credenciais SMTP encontrada no pacote 'blastula'. Atualize o pacote.")
-  }
-}
-
-# ------------------------------------------------------------
 # ✉️ Enviar e-mail com blastula via Gmail SMTP
 # ------------------------------------------------------------
 tryCatch({
@@ -143,12 +84,21 @@ Cumprimentos,
     "))
   )
 
+  # Credenciais SMTP (modo moderno)
+  creds <- blastula::smtp_credentials(
+    host = "smtp.gmail.com",
+    port = 465,
+    user = SMTP_USER,
+    password = SMTP_PASS,
+    use_ssl = TRUE
+  )
+
   smtp_send(
     email = email_msg,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = blastula::creds_file("gmail_creds"),
+    credentials = creds,
     attachments = output_path
   )
 
