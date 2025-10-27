@@ -70,6 +70,39 @@ writeLines(conteudo, con = output_path)
 cat(glue("📁 Arquivo salvo: {output_path}\n"))
 
 # ------------------------------------------------------------
+# 🧩 Função compatível com várias versões do blastula
+# ------------------------------------------------------------
+get_smtp_credentials <- function() {
+  if ("smtp_credentials" %in% getNamespaceExports("blastula")) {
+    return(blastula::smtp_credentials(
+      host = "smtp.gmail.com",
+      port = 465,
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      use_ssl = TRUE
+    ))
+  } else if ("creds_smtp" %in% getNamespaceExports("blastula")) {
+    return(blastula::creds_smtp(
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      host = "smtp.gmail.com",
+      port = 465,
+      use_ssl = TRUE
+    ))
+  } else if ("creds" %in% getNamespaceExports("blastula")) {
+    return(blastula::creds(
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      host = "smtp.gmail.com",
+      port = 465,
+      use_ssl = TRUE
+    ))
+  } else {
+    stop("❌ Nenhuma função de credenciais SMTP encontrada no pacote 'blastula'. Atualize o pacote.")
+  }
+}
+
+# ------------------------------------------------------------
 # ✉️ Enviar e-mail com blastula via Gmail SMTP
 # ------------------------------------------------------------
 tryCatch({
@@ -90,13 +123,7 @@ Cumprimentos,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = blastula::smtp_credentials(
-      host = "smtp.gmail.com",
-      port = 465,
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      use_ssl = TRUE
-    ),
+    credentials = get_smtp_credentials(),
     attachments = output_path
   )
 
