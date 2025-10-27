@@ -18,11 +18,11 @@ if (file.exists(".env")) {
 }
 
 SMTP_USER <- Sys.getenv("SMTP_USER", "byosync.health@gmail.com")
-SMTP_PASS <- Sys.getenv("SMTP_PASS", "")
+SMTP_PASS <- Sys.getenv("GMAIL_APP_PASS", "")
 SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.health@gmail.com")
 
 # ------------------------------------------------------------
-# 🧠 Lê argumentos da linha de comando
+# 🧠 Ler argumentos
 # ------------------------------------------------------------
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -53,9 +53,6 @@ if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 cat(glue("📊 Gerando relatório para tester: {tester_id} | email: {email}\n"))
 
-# ------------------------------------------------------------
-# 🧩 Simula a geração do relatório
-# ------------------------------------------------------------
 Sys.sleep(2)
 output_path <- file.path(output_dir, glue("relatorio_{tester_id}.txt"))
 
@@ -81,7 +78,7 @@ tryCatch({
 Olá {tester_id},
 
 O seu relatório foi gerado com sucesso ✅  
-Pode encontrar o ficheiro em anexo.
+O ficheiro está em anexo.
 
 Cumprimentos,  
 **Equipa BYOSync**
@@ -93,13 +90,13 @@ Cumprimentos,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    email_creds <- blastula::creds(
-  user = "byosync.health@gmail.com",
-  password = Sys.getenv("GMAIL_PASS"),
-  host = "smtp.gmail.com",
-  port = 465,
-  use_ssl = TRUE
-) 
+    credentials = blastula::creds(
+      user = SMTP_USER,
+      password = SMTP_PASS,
+      host = "smtp.gmail.com",
+      port = 465,
+      use_ssl = TRUE
+    ),
     attachments = output_path
   )
 
