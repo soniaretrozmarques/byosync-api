@@ -85,12 +85,12 @@ Cumprimentos,
     "))
   )
 
-  smtp_send(
+   smtp_send(
     email = email_msg,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = blastula::creds(
+    credentials = blastula::creds_smtp(
       user = SMTP_USER,
       password = SMTP_PASS,
       host = "smtp.gmail.com",
@@ -98,7 +98,7 @@ Cumprimentos,
       use_ssl = TRUE
     ),
     attachments = output_path
-  )
+  ) 
 
   cat(glue("📨 E-mail enviado com sucesso para {email}\n"))
 }, error = function(e) {
