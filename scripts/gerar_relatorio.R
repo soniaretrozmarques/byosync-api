@@ -18,7 +18,7 @@ if (file.exists(".env")) {
 }
 
 SMTP_USER <- Sys.getenv("SMTP_USER", "byosync.health@gmail.com")
-SMTP_PASS <- Sys.getenv("GMAIL_APP_PASS", "")
+SMTP_PASS <- Sys.getenv("SMTP_PASS", "")
 SMTP_FROM <- Sys.getenv("SMTP_FROM", "byosync.health@gmail.com")
 
 # ------------------------------------------------------------
@@ -78,14 +78,14 @@ tryCatch({
 Olá {tester_id},
 
 O seu relatório foi gerado com sucesso ✅  
-O ficheiro está em anexo.
+Pode encontrar o ficheiro em anexo.
 
 Cumprimentos,  
 **Equipa BYOSync**
     "))
   )
 
-   smtp_send(
+  smtp_send(
     email = email_msg,
     from = SMTP_FROM,
     to = email,
@@ -98,7 +98,7 @@ Cumprimentos,
       use_ssl = TRUE
     ),
     attachments = output_path
-  ) 
+  )
 
   cat(glue("📨 E-mail enviado com sucesso para {email}\n"))
 }, error = function(e) {
