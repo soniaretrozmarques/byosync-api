@@ -20,11 +20,8 @@ RUN apt-get update && apt-get install -y \
 # ------------------------------------------------------------
 RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
 
-# Instalar tudo o resto, exceto blastula
-RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org', dependencies=TRUE)"
-
-# ⚡ Instalar a versão mais recente do blastula (com creds_smtp)
-RUN R -e "remotes::install_github('rstudio/blastula')"
+RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv', 'blastula'), \
+  repos='https://cloud.r-project.org', dependencies=TRUE)"
 
 # ------------------------------------------------------------
 # 🏗️ Diretório de trabalho
