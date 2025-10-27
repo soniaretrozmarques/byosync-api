@@ -90,11 +90,11 @@ Cumprimentos,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = blastula::creds_smtp(
-      user = SMTP_USER,
-      password = SMTP_PASS,
+    credentials = blastula::smtp_credentials(
       host = "smtp.gmail.com",
       port = 465,
+      user = SMTP_USER,
+      password = SMTP_PASS,
       use_ssl = TRUE
     ),
     attachments = output_path
