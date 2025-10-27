@@ -87,7 +87,10 @@ cat(glue("📁 Arquivo salvo: {output_path}\n"))
 # 🧩 Função compatível com várias versões do blastula
 # ------------------------------------------------------------
 get_smtp_credentials <- function() {
-  if ("smtp_credentials" %in% getNamespaceExports("blastula")) {
+  ns <- getNamespaceExports("blastula")
+  
+  # Função moderna (blastula >= 0.4.0)
+  if ("smtp_credentials" %in% ns) {
     return(blastula::smtp_credentials(
       host = "smtp.gmail.com",
       port = 465,
@@ -95,7 +98,9 @@ get_smtp_credentials <- function() {
       password = SMTP_PASS,
       use_ssl = TRUE
     ))
-  } else if ("creds_smtp" %in% getNamespaceExports("blastula")) {
+  }
+  # Função intermédia (blastula 0.3.4 - 0.3.5)
+  else if ("creds_smtp" %in% ns) {
     return(blastula::creds_smtp(
       user = SMTP_USER,
       password = SMTP_PASS,
@@ -103,15 +108,30 @@ get_smtp_credentials <- function() {
       port = 465,
       use_ssl = TRUE
     ))
-  } else if ("creds" %in% getNamespaceExports("blastula")) {
-    return(blastula::creds(
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      host = "smtp.gmail.com",
-      port = 465,
-      use_ssl = TRUE
-    ))
-  } else {
+  }
+  # Função antiga (blastula <= 0.3.2)
+  else if ("creds" %in% ns) {
+    # Verifica se usa "pass" em vez de "password"
+    args <- names(formals(blastula::creds))
+    if ("pass" %in% args) {
+      return(blastula::creds(
+        user = SMTP_USER,
+        pass = SMTP_PASS,
+        host = "smtp.gmail.com",
+        port = 465,
+        use_ssl = TRUE
+      ))
+    } else {
+      return(blastula::creds(
+        user = SMTP_USER,
+        password = SMTP_PASS,
+        host = "smtp.gmail.com",
+        port = 465,
+        use_ssl = TRUE
+      ))
+    }
+  }
+  else {
     stop("❌ Nenhuma função de credenciais SMTP encontrada no pacote 'blastula'. Atualize o pacote.")
   }
 }
