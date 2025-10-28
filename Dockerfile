@@ -2,11 +2,10 @@
 # 🐳 Dockerfile — BYOSync API (Render)
 # =============================================================
 
-# Usa imagem base oficial do R
 FROM rocker/r-ver:4.3.1
 
 # ------------------------------------------------------------
-# 🔧 Instalar dependências do sistema
+# 🔧 Dependências do sistema
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
@@ -20,16 +19,11 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
-# 📦 Instalar pacotes R necessários
+# 📦 Instalar pacotes R necessários (blastula já incluído)
 # ------------------------------------------------------------
-RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
-
 RUN R -e "install.packages(c( \
-  'plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv' \
+  'plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv', 'blastula' \
   ), repos='https://cloud.r-project.org', dependencies=TRUE)"
-
-# ⚡ Instalar versão mais recente do blastula (>= 0.4.0)
-RUN R -e "remotes::install_github('rstudio/blastula@v0.4.0')"
 
 # ------------------------------------------------------------
 # 🏗️ Diretório de trabalho
