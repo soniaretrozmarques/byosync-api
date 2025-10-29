@@ -2,16 +2,18 @@
 # 🐳 Dockerfile — BYOSync API (Render)
 # =============================================================
 
+# Usa imagem base oficial do R
 FROM rocker/r-ver:4.3.1
 
 # ------------------------------------------------------------
-# 🔧 Dependências do sistema
+# 🔧 Instalar dependências do sistema
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     libcurl4-openssl-dev \
     libssl-dev \
     libxml2-dev \
     libgit2-dev \
+    libsasl2-dev \
     libsodium-dev \
     zlib1g-dev \
     pandoc \
@@ -19,11 +21,13 @@ RUN apt-get update && apt-get install -y \
  && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
-# 📦 Instalar pacotes R necessários (blastula já incluído)
+# 📦 Instalar pacotes R necessários
 # ------------------------------------------------------------
-RUN R -e "install.packages(c( \
-  'plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv', 'blastula' \
-  ), repos='https://cloud.r-project.org', dependencies=TRUE)"
+RUN R -e "install.packages('remotes', repos='https://cloud.r-project.org')"
+RUN R -e "install.packages(c('plumber', 'glue', 'rmarkdown', 'dplyr', 'httr', 'jsonlite', 'dotenv'), repos='https://cloud.r-project.org', dependencies=TRUE)"
+
+# ⚡ Instalar versão mais recente do blastula diretamente do GitHub
+RUN R -e "remotes::install_github('rstudio/blastula', upgrade='always')"
 
 # ------------------------------------------------------------
 # 🏗️ Diretório de trabalho
@@ -43,4 +47,4 @@ EXPOSE 8000
 # ------------------------------------------------------------
 # 🚀 Comando de arranque
 # ------------------------------------------------------------
-CMD ["Rscript", "start.R"]
+CMD ['Rscript', 'start.R']
