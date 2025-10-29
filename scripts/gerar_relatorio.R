@@ -84,33 +84,18 @@ Cumprimentos,
     "))
   )
 
-  ns <- getNamespaceExports("blastula")
-  if ("smtp_credentials" %in% ns) {
-    creds <- blastula::smtp_credentials(
-      host = "smtp.gmail.com",
-      port = 465,
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      use_ssl = TRUE
-    )
-  } else if ("creds_smtp" %in% ns) {
-    creds <- blastula::creds_smtp(
-      user = SMTP_USER,
-      password = SMTP_PASS,
-      host = "smtp.gmail.com",
-      port = 465,
-      use_ssl = TRUE
-    )
-  } else {
-    stop("❌ Nenhuma função SMTP suportada encontrada em blastula.")
-  }
-
   smtp_send(
     email = email_msg,
     from = SMTP_FROM,
     to = email,
     subject = glue("Relatório BYOSync — {tester_id}"),
-    credentials = creds,
+    credentials = creds_smtp(
+      host = "smtp.gmail.com",
+      port = 465,
+      user = SMTP_USER,
+      password = Sys.getenv("SMTP_PASS"),  # ⚠️ password de app do Gmail
+      use_ssl = TRUE
+    ),
     attachments = output_path
   )
 
